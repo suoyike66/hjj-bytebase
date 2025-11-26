@@ -1,5 +1,20 @@
 import { http } from '@/utils/http';
 
+// GitHub访问令牌数据类型定义
+export interface GithubTokenData {
+  access_token: string;
+  token_type: string;
+  scope: string;
+}
+
+// GitHub用户邮箱类型定义
+export interface GithubEmail {
+  email: string;
+  primary: boolean;
+  verified: boolean;
+  visibility?: string;
+}
+
 // GitHub用户信息类型定义
 export interface GithubUserInfo {
   id: number;
@@ -85,18 +100,84 @@ export const handleGithubCallback = async (code: string) => {
       return mockResponse;
     }
     
-    // 生产环境正常调用后端API
-    console.log('生产环境：准备调用后端API');
-    const response = await http.post('/api/auth/github', {
-      code,
+    // 生产环境下，直接调用GitHub API获取访问令牌
+    console.log('生产环境：直接调用GitHub API获取访问令牌');
+    
+    // 替换为你的GitHub OAuth应用的客户端ID和客户端密钥
+    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || 'your-client-id';
+    const clientSecret = import.meta.env.VITE_GITHUB_CLIENT_SECRET || 'your-client-secret';
+    
+    // 调用GitHub API获取访问令牌
+    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+      }),
     });
     
-    if (!response || !response.data) {
-      throw new Error('无效的API响应');
+    if (!tokenResponse.ok) {
+      console.error('获取访问令牌失败:', tokenResponse.status, await tokenResponse.text());
+      throw new Error('获取访问令牌失败');
     }
     
-    console.log('后端API调用成功');
-    return response.data;
+    const tokenData: GithubTokenData = await tokenResponse.json();
+    console.log('获取访问令牌成功:', tokenData);
+    
+    // 使用访问令牌获取用户信息
+    const userResponse = await fetch('https://api.github.com/user', {
+      headers: {
+        'Authorization': `token ${tokenData.access_token}`,
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+    
+    if (!userResponse.ok) {
+      console.error('获取用户信息失败:', userResponse.status, await userResponse.text());
+      throw new Error('获取用户信息失败');
+    }
+    
+    const userData: GithubUserInfo = await userResponse.json();
+    console.log('获取用户信息成功:', userData);
+    
+    // 获取用户邮箱
+    const emailsResponse = await fetch('https://api.github.com/user/emails', {
+      headers: {
+        'Authorization': `token ${tokenData.access_token}`,
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+    
+    if (emailsResponse.ok) {
+      const emails: GithubEmail[] = await emailsResponse.json();
+      // 找到主邮箱
+      const primaryEmail = emails.find((email: GithubEmail) => email.primary && email.verified);
+      if (primaryEmail) {
+        userData.email = primaryEmail.email;
+      }
+    }
+    
+    // 返回处理结果
+    const response = {
+      token: tokenData.access_token,
+      user: {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        login: userData.login,
+        avatar_url: userData.avatar_url,
+      },
+      success: true,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7天后过期
+    };
+    
+    console.log('GitHub登录回调处理成功，准备返回数据');
+    return response;
   } catch (error) {
     console.error('GitHub登录回调处理失败:', error);
     
