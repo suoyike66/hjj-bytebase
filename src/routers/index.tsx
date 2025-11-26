@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createHashRouter } from 'react-router-dom'
 import Login from '@/pages/Login'
 import Layout from '@/pages/Layout'
 import Home from '@/pages/Home'
@@ -38,7 +38,7 @@ const routes = [
 ]
 
 // 创建路由器实例
-const router = createBrowserRouter(
+const router = createHashRouter(
   routes.map(route => {
     // 对于需要认证的路由（除了登录页、回调页和根路径）
     if (route.path !== '/login' && route.path !== '/github/callback' && route.path !== '/') {

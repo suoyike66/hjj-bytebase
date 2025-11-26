@@ -24,13 +24,23 @@ export interface GithubUserInfo {
 export const getGithubAuthUrl = () => {
   // 实际项目中，这个URL通常由后端提供，或者使用环境变量配置GitHub OAuth应用信息
   const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || 'your-client-id';
-  // 使用VITE_BASE_URL环境变量构建回调URL，确保端口一致性
-  const baseUrl = import.meta.env.VITE_BASE_URL || window.location.origin;
-  const redirectUri = encodeURIComponent(`${baseUrl}/github/callback`);
+  
+  // 配置正确的redirect_uri，根据环境使用不同的URL
+  let redirectUri: string;
+  
+  // 生产环境（GitHub Pages）使用GitHub Pages的URL
+  if (window.location.hostname === 'suoyike66.github.io') {
+    redirectUri = encodeURIComponent('https://suoyike66.github.io/hjj-bytebase/');
+  } else {
+    // 开发环境使用localhost
+    redirectUri = encodeURIComponent('http://localhost:5173');
+  }
+  
   const scope = 'user:email'; // 请求的权限范围
   
-  console.log('GitHub OAuth配置:', { clientId, redirectUri, baseUrl });
+  console.log('GitHub OAuth配置:', { clientId, redirectUri });
   console.log('当前环境:', import.meta.env.DEV ? '开发环境' : '生产环境');
+  console.log('当前hostname:', window.location.hostname);
   
   return `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
 };

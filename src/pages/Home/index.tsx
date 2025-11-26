@@ -1,4 +1,5 @@
 import logo from '@/assets/logo.svg';
+import noDataImage from '@/assets/no-data-DEkwQ1sO.webp';
 import { useState, useEffect } from 'react';
 import { getGithubUserInfo, logout } from '@/apis/githubAuth';
 import type { GithubUserInfo } from '@/apis/githubAuth';
@@ -194,7 +195,7 @@ const Home = () => {
                 <div className="inline-block">
                   {/* 使用指定的no-data图片 */}
                   <img 
-                    src="/src/assets/no-data-DEkwQ1sO.webp" 
+                    src={noDataImage} 
                     alt="No Data" 
                     className="max-w-full h-auto" 
                   />

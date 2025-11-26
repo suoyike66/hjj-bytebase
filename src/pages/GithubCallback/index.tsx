@@ -7,10 +7,21 @@ const GithubCallback = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 从URL中获取GitHub返回的授权码
+    // 从URL中获取GitHub返回的授权码，处理哈希路由和普通路由两种情况
+    let code: string | null = null;
+    let error: string | null = null;
+    
+    // 首先检查普通URL参数
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const error = urlParams.get('error');
+    code = urlParams.get('code');
+    error = urlParams.get('error');
+    
+    // 如果没有找到，检查哈希部分
+    if (!code && window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      code = hashParams.get('code');
+      error = hashParams.get('error');
+    }
     
     console.log('GithubCallback组件加载，URL参数:', { code, error });
     console.log('当前环境:', import.meta.env.DEV ? '开发环境' : '生产环境');
@@ -114,22 +125,24 @@ const GithubCallback = () => {
     // 添加额外的安全保障，确保即使异步操作有问题也能跳转
     setTimeout(() => {
       console.log('安全保障：检查当前URL是否仍在callback页面');
-      if (window.location.pathname === '/github/callback') {
-        console.log('安全保障：仍在callback页面，强制执行跳转');
+      // 对于哈希路由，检查URL中是否包含callback相关信息
+      if (window.location.hash.includes('callback') || window.location.pathname === '/github/callback') {
+        console.log('安全保障：仍在callback相关页面，强制执行跳转');
         try {
           navigate('/home');
           console.log('使用navigate尝试跳转');
           // 再次检查是否跳转成功
           setTimeout(() => {
-            if (window.location.pathname === '/github/callback') {
+            if (window.location.hash.includes('callback') || window.location.pathname === '/github/callback') {
               console.log('navigate跳转失败，使用window.location.href作为最终手段');
-              // 使用最直接的方式进行跳转
-              window.location.href = '/home';
+              // 使用最直接的方式进行跳转，包含项目名称hjj-bytebase
+              window.location.href = window.location.origin + '/hjj-bytebase/#/home';
             }
           }, 500);
         } catch (e) {
           console.error('跳转失败，使用备用方案', e);
-          window.location.href = '/home';
+          // 使用最直接的方式进行跳转，包含项目名称hjj-bytebase
+          window.location.href = window.location.origin + '/hjj-bytebase/#/home';
         }
       }
     }, 3000);

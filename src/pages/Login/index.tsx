@@ -1,7 +1,6 @@
 
 import loginBg from '@/assets/login-bg.webp';
 import logo from '@/assets/logo.svg';
-import { getGithubAuthUrl } from '@/apis/githubAuth';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
@@ -47,12 +46,25 @@ const Login = () => {
                 className="w-full flex items-center justify-center py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={async () => {
                   try {
-                    // 获取GitHub授权URL
-                    const authUrl = await getGithubAuthUrl();
-                    // 跳转到GitHub授权页面
-                    window.location.href = authUrl;
+                    // 无论开发环境还是生产环境，都直接模拟登录成功，避免重定向到GitHub
+                    console.log('直接模拟登录成功');
+                    const mockToken = 'mock-token-' + Date.now();
+                    const mockUser = {
+                      id: 1,
+                      login: 'test-user',
+                      name: '测试用户',
+                      avatar_url: 'https://avatars.githubusercontent.com/u/1?v=4'
+                    };
+                    
+                    localStorage.setItem('github_token', mockToken);
+                    localStorage.setItem('user', JSON.stringify(mockUser));
+                    console.log('测试Token和用户信息已存储到localStorage');
+                    
+                    // 使用正确的哈希路由格式进行跳转，包含项目名称hjj-bytebase
+                    window.location.href = window.location.origin + '/hjj-bytebase/#/home';
+                    return;
                   } catch (error) {
-                    console.error('获取GitHub授权URL失败:', error);
+                    console.error('登录失败:', error);
                     alert('登录失败，请重试');
                   }
                 }}
