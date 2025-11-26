@@ -1,5 +1,6 @@
 import logo from '@/assets/logo.svg';
 import layoutImage from '@/assets/lyout-picture.webp';
+import { Link } from 'react-router-dom';
 
 const Layout = () => {
   return (
@@ -22,9 +23,9 @@ const Layout = () => {
             Bytebase Hub 用于访问 Bytebase 云服务并管理您的 Bytebase 云和自托管订阅。
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <a href="/login" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 text-center">
+            <Link to="/login" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 text-center">
               登录/注册
-            </a>
+            </Link>
             <a 
               href="https://www.bytebase.com/pricing/?source=hub" 
               target="_blank" 

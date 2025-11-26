@@ -37,13 +37,13 @@ const Home = () => {
       await logout();
       // 清除localStorage中的token
       localStorage.removeItem('github_token');
-      // 重定向到登录页
-      navigate('/login');
+      // 重定向到根路径
+      navigate('/');
     } catch (error) {
       console.error('退出登录失败:', error);
       // 即使API调用失败，也清除本地token并重定向
       localStorage.removeItem('github_token');
-      navigate('/login');
+      navigate('/');
     }
   };
 

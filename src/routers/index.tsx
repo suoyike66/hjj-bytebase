@@ -20,8 +20,6 @@ const routes = [
   {
     path: '/',
     element: <Layout />,
-    // 根路径重定向到登录页
-    redirect: '/login'
   },
   {
     path: '/home',
@@ -42,8 +40,8 @@ const routes = [
 // 创建路由器实例
 const router = createBrowserRouter(
   routes.map(route => {
-    // 对于需要认证的路由（除了登录页和回调页）
-    if (route.path !== '/login' && route.path !== '/github/callback') {
+    // 对于需要认证的路由（除了登录页、回调页和根路径）
+    if (route.path !== '/login' && route.path !== '/github/callback' && route.path !== '/') {
       return {
         ...route,
         loader: () => {

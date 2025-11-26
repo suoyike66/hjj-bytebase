@@ -2,6 +2,7 @@
 import loginBg from '@/assets/login-bg.webp';
 import logo from '@/assets/logo.svg';
 import { getGithubAuthUrl } from '@/apis/githubAuth';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   return (
@@ -101,7 +102,7 @@ const Login = () => {
             {/* 注册链接 */}
             <div className="mt-6 text-center">
               <span className="text-gray-600">没有账户？</span>
-              <a href="/register" className="text-blue-600 hover:underline ml-1">注册</a>
+              <Link to="/register" className="text-blue-600 hover:underline ml-1">注册</Link>
             </div>
           </div>
         </div>
