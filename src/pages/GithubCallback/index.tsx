@@ -39,7 +39,7 @@ const GithubCallback = () => {
               avatar_url: 'https://avatars.githubusercontent.com/u/1?v=4'
             };
             
-            localStorage.setItem('token', mockToken);
+            localStorage.setItem('github_token', mockToken);
             localStorage.setItem('user', JSON.stringify(mockUser));
             console.log('测试Token和用户信息已存储到localStorage');
             
@@ -67,7 +67,7 @@ const GithubCallback = () => {
         
         // 存储token和用户信息到localStorage
         if (response?.token) {
-          localStorage.setItem('token', response.token);
+          localStorage.setItem('github_token', response.token);
           console.log('Token已存储到localStorage');
           
           // 如果有用户信息也存储起来
@@ -89,7 +89,7 @@ const GithubCallback = () => {
         if (import.meta.env.DEV) {
           console.log('开发环境：API调用失败但模拟登录成功');
           const fallbackToken = 'fallback-dev-token-' + Date.now();
-          localStorage.setItem('token', fallbackToken);
+          localStorage.setItem('github_token', fallbackToken);
           localStorage.setItem('user', JSON.stringify({
             id: 2,
             login: 'fallback-user',
