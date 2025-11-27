@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { handleGithubCallback } from '@/apis/githubAuth';
+import { handleGithubCallback, getGithubUserInfo } from '@/apis/githubAuth';
 
 const GithubCallback = () => {
   const navigate = useNavigate();
@@ -81,10 +81,20 @@ const GithubCallback = () => {
           localStorage.setItem('github_token', response.token);
           console.log('Token已存储到localStorage');
           
-          // 如果有用户信息也存储起来
-          if (response?.user) {
-            localStorage.setItem('user', JSON.stringify(response.user));
-            console.log('用户信息已存储到localStorage');
+          // 使用token获取GitHub用户详细信息，包括邮箱
+          console.log('使用token获取GitHub用户详细信息');
+          const userInfo = await getGithubUserInfo(response.token);
+          console.log('获取到的GitHub用户详细信息:', userInfo);
+          
+          // 存储完整的用户信息到localStorage
+          localStorage.setItem('user', JSON.stringify(userInfo));
+          console.log('完整用户信息已存储到localStorage');
+          
+          // 显示用户邮箱信息（如果有）
+          if (userInfo.email) {
+            console.log('用户邮箱:', userInfo.email);
+          } else {
+            console.log('未获取到用户邮箱信息');
           }
         }
         

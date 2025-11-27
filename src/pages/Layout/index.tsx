@@ -1,8 +1,48 @@
 import logo from '@/assets/logo.svg';
 import layoutImage from '@/assets/lyout-picture.webp';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { handleGithubCallback, getGithubUserInfo } from '@/apis/githubAuth';
 
 const Layout = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // 检查URL中是否包含GitHub返回的授权码
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    // 如果有授权码，处理GitHub回调
+    if (code) {
+      console.log('Layout页面检测到GitHub授权码，开始处理回调');
+      
+      const processCallback = async () => {
+        try {
+          // 调用后端API，使用授权码获取访问令牌
+          const response = await handleGithubCallback(code);
+          
+          // 存储token和用户信息到localStorage
+          if (response?.token) {
+            localStorage.setItem('github_token', response.token);
+            
+            // 使用token获取GitHub用户详细信息，包括邮箱
+            const userInfo = await getGithubUserInfo(response.token);
+            localStorage.setItem('user', JSON.stringify(userInfo));
+            
+            // 跳转到home页面
+            navigate('/home');
+          }
+        } catch (err) {
+          console.error('处理GitHub回调失败:', err);
+          // 处理失败后跳转到登录页面
+          navigate('/login');
+        }
+      };
+      
+      processCallback();
+    }
+  }, [navigate]);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header with Logo */}

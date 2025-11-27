@@ -36,15 +36,21 @@ const Home = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      // 清除localStorage中的token
+      // 清除localStorage中的token和用户信息
       localStorage.removeItem('github_token');
-      // 重定向到根路径
-      navigate('/');
+      localStorage.removeItem('user');
+      
+      // 完全重置URL，清除所有查询参数和哈希，跳转到Layout页面
+      // 使用window.location.href而不是navigate，确保URL被完全重置
+      window.location.href = window.location.origin + '/hjj-bytebase/';
     } catch (error) {
       console.error('退出登录失败:', error);
-      // 即使API调用失败，也清除本地token并重定向
+      // 即使API调用失败，也清除本地token和用户信息并重定向
       localStorage.removeItem('github_token');
-      navigate('/');
+      localStorage.removeItem('user');
+      
+      // 完全重置URL，清除所有查询参数和哈希，跳转到Layout页面
+      window.location.href = window.location.origin + '/hjj-bytebase/';
     }
   };
 
